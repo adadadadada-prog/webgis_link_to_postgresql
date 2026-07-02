@@ -5,7 +5,7 @@ from app.core.database import engine
 
 
 router = APIRouter(prefix="/health", tags=["health"])
-
+print("xxxxxxxxx")
 print("xxxxxxxxx")
 @router.get("/db")
 async def check_database():
