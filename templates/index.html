@@ -26,7 +26,12 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
             var maker = L.marker([51.5, -0.09]).addTo(map);
-            function onMapClick(e) {
+            async function onMapClick(e) {
+                let getresponse =await fetch(
+                    "/post_point",{method:'post',
+                    //headers:{ 'Content-Type': 'application/json',},
+                    body: JSON.stringify({ lat: e.latlng.lat, lon: e.latlng.lng })})
+
                 var marker = L.marker([
                     e.latlng.lat,
                     e.latlng.lng

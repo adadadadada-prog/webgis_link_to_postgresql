@@ -20,13 +20,13 @@ async def root(request : Request):
 @app.post("/post_point",response_class=HTMLResponse)
 async def root(request : Request):
     
-    html_content = open("templates\index.html",encoding="utf-8").read()
-    form_data = await request.form()
+    form_data = await request.json()
+    print(form_data)
     lat = float(form_data["lat"])
     lon = float(form_data["lon"])
     print(lat,lon)
-    load_point(lat,lon)
+    # load_point(lat,lon)
     return "get_point"
 
 if __name__ == "__main__":
-    uvicorn.run(app,reload=True)
+    uvicorn.run(app='main:app',reload=True)
