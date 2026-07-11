@@ -70,7 +70,18 @@
                 currentpolygon = L.polygon([], {color: 'red'}).addTo(map);
             })
 
-            button_non.addEventListener("click",function() {
+            button_non.addEventListener("click",async function() {
+                console.log(Linepoints)
+                if(lineflag){
+                    let getresponse =await fetch(
+                    "/post_line",{method:'post',
+                    body: JSON.stringify({ pointlist:Linepoints })})
+                }
+                if(polygonflag){
+                    let getresponse =await fetch(
+                    "/post_polygon",{method:'post',
+                    body: JSON.stringify({ pointlist:Linepoints })})
+                }
                 pointflag = 0;
                 lineflag = 0;
                 polygonflag = 0;
@@ -120,11 +131,22 @@
                 ).addTo(map);
             })
 
+            const lines = {{ lines | tojson }};
+            lines.forEach(function(line){
+                L.geoJSON(
+                    line.geometry,
+                    {
+                        style: {
+                            color: "red",
+                            weight: 4
+                        }
+                    }
+                ).addTo(map);
+            })
+
            
 
-            var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
-
-            var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+           
             
         </script>
         

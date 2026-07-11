@@ -1,4 +1,5 @@
 import psycopg2
+import json
 dbname = "schooldb"
 user = "postgres"
 password = "postgis"
@@ -8,7 +9,7 @@ port = "5433"
 
 # 获取结果
 
-def load_alldata() ->list[dict]:
+def load_pointdata() ->list[dict]:
 
     conn_string = f"host={host} port={port} dbname={dbname} user={user} password={password}"
     conn = psycopg2.connect(conn_string)
@@ -29,6 +30,26 @@ def load_alldata() ->list[dict]:
         
     return points
 
+def load_line()->list:
+    conn_string = f"host={host} port={port} dbname={dbname} user={user} password={password}"
+    conn = psycopg2.connect(conn_string)
+    cursor = conn.cursor()
 
+    query = "SELECT index,ST_AsGeoJSON(line) FROM lines;"
+    cursor.execute(query)
+
+    results = cursor.fetchall()
+    lines = []
+    for row in results:
+        line = {
+            "index":row[0],
+            "geometry":json.loads(row[1])
+        }
+        lines.append(line)
+    return lines
+    
+
+
+    
 
 

@@ -32,4 +32,3 @@ INSERT INTO points (
     cursor.execute(insert_point,(lat,lon))
     conn.commit()
 
-print("Table created successfully.")
