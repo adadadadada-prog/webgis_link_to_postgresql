@@ -47,6 +47,24 @@ def load_line()->list:
         }
         lines.append(line)
     return lines
+
+def load_polygon()->list:
+    conn_string = f"host={host} port={port} dbname={dbname} user={user} password={password}"
+    conn = psycopg2.connect(conn_string)
+    cursor = conn.cursor()
+
+    query = "SELECT index,ST_AsGeoJSON(poly) FROM polygons;"
+    cursor.execute(query)
+
+    results = cursor.fetchall()
+    polys = []
+    for row in results:
+        poly = {
+            "index":row[0],
+            "geometry":json.loads(row[1])
+        }
+        polys.append(poly)
+    return polys
     
 
 

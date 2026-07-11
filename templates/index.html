@@ -80,7 +80,7 @@
                 if(polygonflag){
                     let getresponse =await fetch(
                     "/post_polygon",{method:'post',
-                    body: JSON.stringify({ pointlist:Linepoints })})
+                    body: JSON.stringify({ pointlist:polypoint })})
                 }
                 pointflag = 0;
                 lineflag = 0;
@@ -131,10 +131,24 @@
                 ).addTo(map);
             })
 
+
             const lines = {{ lines | tojson }};
             lines.forEach(function(line){
                 L.geoJSON(
                     line.geometry,
+                    {
+                        style: {
+                            color: "red",
+                            weight: 4
+                        }
+                    }
+                ).addTo(map);
+            })
+
+            const polys = {{ polys | tojson }};
+            polys.forEach(function(poly){
+                L.geoJSON(
+                    poly.geometry,
                     {
                         style: {
                             color: "red",

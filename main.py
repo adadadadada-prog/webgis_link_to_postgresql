@@ -6,8 +6,11 @@ from fastapi.templating import Jinja2Templates
 
 from app.s_point import store_point
 from app.s_line import store_line
+from app.s_polygon import store_polygon
 from app.load_data import load_pointdata
 from app.load_data import load_line
+from app.load_data import load_polygon
+
 app = FastAPI()
 
 @app.get("/")
@@ -19,9 +22,10 @@ templates = Jinja2Templates(directory="templates")
 async def root(request : Request):
     points = load_pointdata()
     lines = load_line()
+    polygons = load_polygon()
     
     
-    return templates.TemplateResponse(request=request,name="index.html", context={"points": points,"lines":lines})
+    return templates.TemplateResponse(request=request,name="index.html", context={"points": points,"lines":lines,"polys":polygons})
 
 @app.post("/post_point",response_class=HTMLResponse)
 async def root(request : Request):
@@ -37,15 +41,14 @@ async def root(request : Request):
 @app.post("/post_line",response_class=HTMLResponse)
 async def root(request : Request):
     
-    form_data = await request.json()
-    print(form_data)
-    
+    form_data = await request.json()  
     store_line(form_data)
     return "get_point"
 
 @app.post("/post_polygon",response_class=HTMLResponse)
 async def root(request : Request):
-    
+    form_data = await request.json()
+    store_polygon(form_data)
     pass
 
 if __name__ == "__main__":
