@@ -5,13 +5,18 @@
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
      <style>
-        #map {    width: 40%;
+        #map {    width: 80%;
             height: 600px;
             margin: 0 auto;}
+            
      </style>
     </head>
 
     <body>
+        <button class="add_point">创建点数据</button>
+        <button class="add_line">创建线数据</button>
+        <button class="add_polygon">创建面数据</button>
+        <button class="no">取消选择工具</button>
         
         <h1>Hello aWorld</h1>
         <div id="map"></div>
@@ -20,25 +25,107 @@
         crossorigin="">
         </script>
         <script>
-             var map = L.map('map').setView([51.505, -0.09], 13);
+            
+            var map = L.map('map').setView([51.505, -0.09], 13);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-            var maker = L.marker([51.5, -0.09]).addTo(map);
+            let pointflag = 0;
+            let lineflag = 0;
+            let polygonflag = 0;
+            let Linepoints = []
+            let currentLine = null;
+            let polypoint = []
+            let currentpolygon = null;
+            const button_addppopint = document.querySelector(".add_point");
+            const button_addlien = document.querySelector(".add_line");
+            const button_addpolygon = document.querySelector(".add_polygon");
+            const button_non = document.querySelector(".no");
+
+//按钮调控部分
+            button_addppopint.addEventListener("click", function () {
+                pointflag = 1;
+            });
+            button_addlien.addEventListener("click",function(){
+                lineflag = 1;
+                Lpointlist = [];
+                {
+                    lineflag = 1;
+                    Linepoints = [];
+                    currentLine = L.polyline(
+                        [],
+                        {
+                            color: "red",
+                            weight: 4
+                        }
+                    ).addTo(map);
+
+                }
+
+            })
+            button_addpolygon.addEventListener("click",function(){
+                polygonflag = 1;
+                polypoint = []
+                currentpolygon = L.polygon([], {color: 'red'}).addTo(map);
+            })
+
+            button_non.addEventListener("click",function() {
+                pointflag = 0;
+                lineflag = 0;
+                polygonflag = 0;
+            })
+
+
+//鼠标点击事件部分
             async function onMapClick(e) {
-                let getresponse =await fetch(
+                if(pointflag == 1){
+                    let getresponse =await fetch(
                     "/post_point",{method:'post',
                     //headers:{ 'Content-Type': 'application/json',},
                     body: JSON.stringify({ lat: e.latlng.lat, lon: e.latlng.lng })})
 
-                var marker = L.marker([
-                    e.latlng.lat,
-                    e.latlng.lng
-                ]).addTo(map);
+                    var marker = L.marker([
+                        e.latlng.lat,
+                        e.latlng.lng
+                    ]).addTo(map);
+                }
+
+                if(lineflag ==1){
+                    Linepoints.push(e.latlng);
+
+                    // 把新节点加入当前线
+                    currentLine.addLatLng(e.latlng);
+                    
+                }
+                
+                if(polygonflag ==1){
+                    polypoint.push(e.latlng);
+                    currentpolygon.addLatLng(e.latlng);
+                }
+                
             }
 
             map.on('click', onMapClick);
+
+
+//初始数据加载部分
+            const points = {{ points | tojson }};
+            points.forEach(function(point){
+               L.circleMarker(
+                    [point.lat, point.lon],
+                    {
+                        fillColor: "red",
+                    }
+                ).addTo(map);
+            })
+
+           
+
+            var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
+
+            var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+            
         </script>
         
     </body>

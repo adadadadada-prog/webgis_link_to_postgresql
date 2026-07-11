@@ -2,20 +2,22 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 import uvicorn
 from fastapi import Request
-from app.load_point import store_point
+from fastapi.templating import Jinja2Templates
+from app.s_point import store_point
+from app.load_data import load_alldata
 app = FastAPI()
 
 @app.get("/")
 async def root():
     return 
 
-
+templates = Jinja2Templates(directory="templates")
 @app.get("/aa",response_class=HTMLResponse)
 async def root(request : Request):
-    
-    html_content = open("templates\index.html",encoding="utf-8").read()
-    return html_content
-
+    points = load_alldata()
+    print(points)
+    # html_content = open("templates\index.html",encoding="utf-8").read()
+    return templates.TemplateResponse(request=request,name="index.html", context={"points": points})
 
 @app.post("/post_point",response_class=HTMLResponse)
 async def root(request : Request):
