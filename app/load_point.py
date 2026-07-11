@@ -8,19 +8,28 @@ conn_string = f"host={host} port={port} dbname={dbname} user={user} password={pa
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
 
-# 如果表已存在，则删除
-
-
 # 创建新表
 create_table_query = '''
-CREATE TABLE EMPLOYEE (
-FIRST_NAME CHAR(20) NOT NULL,
-LAST_NAME CHAR(20),
-AGE INT,
-SEX CHAR(1),
-INCOME FLOAT
+CREATE TABLE IF NOT EXISTS points (
+index INTEGER
+       GENERATED ALWAYS AS IDENTITY
+       PRIMARY KEY,
+lat FLOAT,
+lon FLOAT
 )
 '''
 cursor.execute(create_table_query)
 conn.commit()
+
+def store_point(lat,lon):
+    insert_point = '''
+INSERT INTO points (
+        lat,
+        lon
+    )
+    VALUES (%s, %s)
+'''
+    cursor.execute(insert_point,(lat,lon))
+    conn.commit()
+
 print("Table created successfully.")
