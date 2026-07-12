@@ -1,9 +1,11 @@
 import psycopg2
+from app.conectsetting import global_port
+
 dbname = "schooldb"
 user = "postgres"
 password = "postgis"
 host = "127.0.0.1"
-port = "5433"
+port = global_port
 conn_string = f"host={host} port={port} dbname={dbname} user={user} password={password}"
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()

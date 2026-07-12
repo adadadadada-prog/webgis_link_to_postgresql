@@ -1,10 +1,11 @@
 import psycopg2
 import json
+from app.conectsetting import global_port
 dbname = "schooldb"
 user = "postgres"
 password = "postgis"
 host = "127.0.0.1"
-port = "5433"
+port = global_port
 
 
 # 获取结果
