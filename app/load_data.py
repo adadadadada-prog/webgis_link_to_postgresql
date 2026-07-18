@@ -16,20 +16,19 @@ def load_pointdata() ->list[dict]:
     conn = psycopg2.connect(conn_string)
     cursor = conn.cursor()
 
-    query = "SELECT * FROM points;"
+    query = "SELECT index,ST_AsGeoJSON(point) FROM points;"
     cursor.execute(query)
 
     results = cursor.fetchall()
     points = []
-
-
     for row in results:
-       point = {"index":row[0],
-                "lat":row[1],
-                "lon":row[2]}
-       points.append(point)
-        
+        point = {
+            "index":row[0],
+            "geometry":json.loads(row[1])
+        }
+        points.append(point)
     return points
+
 
 def load_line()->list:
     conn_string = f"host={host} port={port} dbname={dbname} user={user} password={password}"

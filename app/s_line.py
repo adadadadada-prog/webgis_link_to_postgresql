@@ -1,5 +1,6 @@
 import psycopg2
 from app.conectsetting import global_port
+import json
 
 dbname = "schooldb"
 user = "postgres"
@@ -22,29 +23,22 @@ line geometry(LineString, 4326)
 cursor.execute(create_table_query)
 conn.commit()
 
-def store_line(linelist:dict):
-    line = []
-    linesinglist = linelist.get("pointlist")
-    for point in linesinglist:
-        lat = point.get("lat")
-        lon = point.get("lng")
-        line.append(f"{lon} {lat}")
+def store_line(geodata):
     
-    print(line)
-    line_wkt = (
-        "LINESTRING("
-        + ", ".join(line)
-        + ")"
-    )
     insert_line = """
     INSERT INTO lines (line)
     VALUES (
-        ST_GeomFromText(
-            %s,
-            4326
+        ST_GeomFromGeoJSON(
+            %s
         )
     )
+    RETURNING index;
     """
-    cursor.execute(insert_line,(line_wkt,))
+    geo_str = json.dumps(geodata)
+
+    cursor.execute(insert_line,(geo_str,))
+    new_index = cursor.fetchone()[0]
     conn.commit()
+
+    return {"new_index":new_index}
 

@@ -1,6 +1,6 @@
 import psycopg2
 from app.conectsetting import global_port
-
+import json
 dbname = "schooldb"
 user = "postgres"
 password = "postgis"
@@ -16,21 +16,23 @@ CREATE TABLE IF NOT EXISTS points (
 index INTEGER
        GENERATED ALWAYS AS IDENTITY
        PRIMARY KEY,
-lat FLOAT,
-lon FLOAT
+point geometry(Point, 4326)
 )
 '''
 cursor.execute(create_table_query)
 conn.commit()
 
-def store_point(lat,lon):
+def store_point(geodata):
     insert_point = '''
-INSERT INTO points (
-        lat,
-        lon
+INSERT INTO points (point)
+values (
+    ST_GeomFromGeoJSON(%s)
     )
-    VALUES (%s, %s)
+    RETURNING index;
 '''
-    cursor.execute(insert_point,(lat,lon))
+    geo_str = json.dumps(geodata) 
+    cursor.execute(insert_point,(geo_str,))
+    new_index = cursor.fetchone()[0]
     conn.commit()
+    return {"new_index":new_index}
 
